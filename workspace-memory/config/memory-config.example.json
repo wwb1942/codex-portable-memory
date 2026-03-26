@@ -1,0 +1,24 @@
+{
+  "workspaceRoot": "C:\\\\path\\\\to\\\\your-workspace",
+  "memoryRoot": "C:\\\\path\\\\to\\\\codex-portable-memory\\\\workspace-memory",
+  "sessionTemplatePath": "C:\\\\path\\\\to\\\\codex-portable-memory\\\\workspace-memory\\\\templates\\\\SESSION-LOG.template.md",
+  "schedule": {
+    "time": "21:00",
+    "taskName": "Codex Workspace Daily Memory"
+  },
+  "lookbackHours": 24,
+  "maxProjectsPerCheckpoint": 10,
+  "maxFilesPerProject": 10,
+  "exclusions": [
+    "_archive",
+    "_templates",
+    "memory"
+  ],
+  "excludedSubdirectories": [
+    ".git",
+    "node_modules",
+    "dist",
+    "build",
+    "coverage"
+  ]
+}

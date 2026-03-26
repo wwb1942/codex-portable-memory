@@ -1,0 +1,4 @@
+interface:
+  display_name: "Portable Memory"
+  short_description: "Portable project and global memory workflow."
+  default_prompt: "Use $portable-memory to recall relevant memory before work, store only durable information, and export or compact memory when needed."

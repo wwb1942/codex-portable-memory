@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "projectId": "codex-memory-mcp",
+  "defaultScope": "project:codex-memory-mcp",
+  "fallbackScopes": ["global"],
+  "writePolicy": {
+    "defaultKind": "episodic",
+    "promoteDecisionToSemantic": true
+  },
+  "recallPolicy": {
+    "maxScopes": 2,
+    "preferProject": true
+  }
+}

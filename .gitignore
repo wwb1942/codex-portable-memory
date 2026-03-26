@@ -1,0 +1,9 @@
+packages/codex-memory-mcp/node_modules/
+packages/codex-memory-mcp/.codex/
+workspace-memory/config/memory-config.json
+workspace-memory/daily/
+workspace-memory/exports/
+workspace-memory/data/
+**/session-log-*.md
+*.jsonl
+*.log

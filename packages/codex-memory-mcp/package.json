@@ -1,0 +1,20 @@
+{
+  "name": "codex-memory-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx src/server.ts",
+    "test": "node --import tsx --test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lancedb/lancedb": "^0.26.2",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@sinclair/typebox": "^0.34.48",
+    "openai": "^6.21.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "zod": "^4.3.6"
+  }
+}
