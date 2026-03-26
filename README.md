@@ -23,6 +23,8 @@ This repository contains the reusable memory framework.
 
 It does not contain personal memory data.
 
+License: [MIT](LICENSE)
+
 Excluded from the publishable repo:
 
 - real daily logs
@@ -134,3 +136,10 @@ Recommended flow:
 3. Store only high-value confirmed memories.
 4. Update or supersede old memories instead of duplicating them.
 5. Export/import when moving machines and compact periodically.
+
+## GitHub Metadata
+
+Suggested GitHub description, topics, and release notes are tracked in:
+
+- [docs/github-metadata.md](docs/github-metadata.md)
+- [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md)
