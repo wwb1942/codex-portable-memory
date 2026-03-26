@@ -1,5 +1,7 @@
 # Codex Portable Memory
 
+![Built with Codex](https://img.shields.io/badge/Built%20with-Codex-000000)
+
 Portable memory stack for Codex, split into three reusable parts:
 
 - `packages/codex-memory-mcp`
