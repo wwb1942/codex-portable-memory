@@ -53,73 +53,50 @@ codex-portable-memory/
 
 ## Quick Start
 
-### 1. Start the MCP backend
+Bootstrap the repository:
 
-```powershell
-cd <repo-root>\packages\codex-memory-mcp
-npm install
-npm test
+```bash
+node scripts/bootstrap.mjs
 ```
 
-Register it with Codex:
+Windows wrapper:
 
 ```powershell
-codex mcp add codex-memory -- node --import tsx <repo-root>\packages\codex-memory-mcp\src\server.ts
+./bootstrap.ps1
 ```
 
-### 2. Install the skill
+macOS/Linux wrapper:
 
-Copy the skill into your Codex skills directory:
-
-```powershell
-Copy-Item -Path <repo-root>\skills\portable-memory `
-  -Destination $HOME\.codex\skills\portable-memory `
-  -Recurse -Force
+```bash
+./bootstrap.sh
 ```
 
-### 3. Configure workspace logging
+Bootstrap will:
 
-Create your local config from the example:
+- install or validate `packages/codex-memory-mcp` dependencies
+- install `skills/portable-memory` into your local Codex skills directory
+- create `workspace-memory/config/memory-config.json` if it does not already exist
+- print exact next-step commands for MCP registration and verification
 
-```powershell
-Copy-Item `
-  -Path <repo-root>\workspace-memory\config\memory-config.example.json `
-  -Destination <repo-root>\workspace-memory\config\memory-config.json
-```
-
-Edit `memory-config.json` for your machine, then run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File <repo-root>\workspace-memory\scripts\write-daily-memory.ps1
-```
-
-`memoryRoot` should point to the cloned `workspace-memory` directory, because the scheduled task definition resolves the script path from that root.
-
-To create or append a project session log:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File <repo-root>\workspace-memory\scripts\write-project-session-log.ps1 `
-  -ProjectRoot C:\path\to\your-project `
-  -Summary 'Implemented the current task'
-```
-
-To register the daily scheduled task:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File <repo-root>\workspace-memory\scripts\register-daily-memory-task.ps1
-```
+Full install and troubleshooting notes live in [docs/install.md](docs/install.md).
 
 ## Verify
 
+Register the MCP server:
+
+```bash
+codex mcp add codex-memory -- node --import tsx <repo-root>/packages/codex-memory-mcp/src/server.ts
+```
+
 Run the MCP backend checks:
 
-```powershell
-cd <repo-root>\packages\codex-memory-mcp
+```bash
+cd <repo-root>/packages/codex-memory-mcp
 npm test
 npm run typecheck
 ```
 
-Run the workspace logging tests:
+Optional workspace logging verification:
 
 ```powershell
 Invoke-Pester -Path <repo-root>\workspace-memory\tests
