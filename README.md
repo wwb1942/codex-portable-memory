@@ -9,6 +9,14 @@ Portable memory stack for Codex, split into three reusable parts:
 - `skills/portable-memory`
   Codex skill that standardizes when to recall, store, update, export, import, and compact memory.
 
+## Use Cases
+
+- Keep durable project memory across Codex sessions
+- Separate repository-specific memory from cross-project preferences
+- Keep Markdown logs usable even when semantic memory services are offline
+- Export and import memory when moving machines
+- Reduce stale or duplicated memory with compaction and supersede rules
+
 ## What This Repository Is
 
 This repository contains the reusable memory framework.
@@ -27,19 +35,19 @@ Excluded from the publishable repo:
 
 ```text
 codex-portable-memory/
-├── packages/
-│   └── codex-memory-mcp/
-├── skills/
-│   └── portable-memory/
-├── workspace-memory/
-│   ├── config/
-│   ├── scripts/
-│   ├── templates/
-│   └── tests/
-└── examples/
+|- packages/
+|  \- codex-memory-mcp/
+|- skills/
+|  \- portable-memory/
+|- workspace-memory/
+|  |- config/
+|  |- scripts/
+|  |- templates/
+|  \- tests/
+\- examples/
 ```
 
-## Install
+## Quick Start
 
 ### 1. Start the MCP backend
 
@@ -95,6 +103,22 @@ To register the daily scheduled task:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File <repo-root>\workspace-memory\scripts\register-daily-memory-task.ps1
+```
+
+## Verify
+
+Run the MCP backend checks:
+
+```powershell
+cd <repo-root>\packages\codex-memory-mcp
+npm test
+npm run typecheck
+```
+
+Run the workspace logging tests:
+
+```powershell
+Invoke-Pester -Path <repo-root>\workspace-memory\tests
 ```
 
 ## Operating Model
