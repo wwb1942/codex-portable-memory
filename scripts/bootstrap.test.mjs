@@ -3,15 +3,35 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 
 import {
+  buildCommandInvocation,
   getCodexHome,
   getSkillInstallPath,
   getWorkspaceConfigPath,
   planCopyAction,
+  planBootstrapOperations,
   renderNextSteps,
 } from './bootstrap-lib.mjs';
 
 test('getCodexHome prefers CODEX_HOME when provided', () => {
   assert.equal(getCodexHome({ CODEX_HOME: '/tmp/codex-home' }), '/tmp/codex-home');
+});
+
+test('buildCommandInvocation uses cmd /c on Windows', () => {
+  assert.deepEqual(buildCommandInvocation('npm', ['--version'], 'win32'), {
+    command: 'cmd.exe',
+    args: ['/c', 'npm', '--version'],
+  });
+  assert.deepEqual(buildCommandInvocation('pwsh', ['--version'], 'win32'), {
+    command: 'cmd.exe',
+    args: ['/c', 'pwsh', '--version'],
+  });
+});
+
+test('buildCommandInvocation leaves commands unchanged off Windows', () => {
+  assert.deepEqual(buildCommandInvocation('npm', ['--version'], 'linux'), {
+    command: 'npm',
+    args: ['--version'],
+  });
 });
 
 test('getSkillInstallPath uses the codex home skills directory', () => {
@@ -71,4 +91,24 @@ test('renderNextSteps prints codex mcp registration command from repo root', () 
 
   assert.match(output, /codex mcp add codex-memory/);
   assert.match(output, /packages\/codex-memory-mcp\/src\/server\.ts/);
+});
+
+test('planBootstrapOperations resolves tracked sources and user destinations', () => {
+  const plan = planBootstrapOperations({
+    repoRoot: '/repo-root',
+    homeDir: '/home/tester',
+    env: {},
+  });
+
+  assert.equal(plan.packageDir, path.join('/repo-root', 'packages', 'codex-memory-mcp'));
+  assert.equal(plan.skillSourceDir, path.join('/repo-root', 'skills', 'portable-memory'));
+  assert.equal(plan.skillDestinationDir, path.join('/home/tester', '.codex', 'skills', 'portable-memory'));
+  assert.equal(
+    plan.workspaceConfigTemplatePath,
+    path.join('/repo-root', 'workspace-memory', 'config', 'memory-config.example.json')
+  );
+  assert.equal(
+    plan.workspaceConfigPath,
+    path.join('/repo-root', 'workspace-memory', 'config', 'memory-config.json')
+  );
 });

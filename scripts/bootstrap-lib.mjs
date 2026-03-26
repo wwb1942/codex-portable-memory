@@ -5,6 +5,20 @@ export function getCodexHome(env = process.env) {
   return env.CODEX_HOME || path.join(os.homedir(), '.codex');
 }
 
+export function buildCommandInvocation(command, args = [], platform = process.platform) {
+  if (platform === 'win32') {
+    return {
+      command: 'cmd.exe',
+      args: ['/c', command, ...args],
+    };
+  }
+
+  return {
+    command,
+    args,
+  };
+}
+
 export function getSkillInstallPath({ env = process.env, homeDir = os.homedir() } = {}) {
   const codexHome = env.CODEX_HOME || path.join(homeDir, '.codex');
   return path.join(codexHome, 'skills', 'portable-memory');
@@ -12,6 +26,25 @@ export function getSkillInstallPath({ env = process.env, homeDir = os.homedir() 
 
 export function getWorkspaceConfigPath(repoRoot) {
   return path.join(repoRoot, 'workspace-memory', 'config', 'memory-config.json');
+}
+
+export function planBootstrapOperations({
+  repoRoot,
+  homeDir = os.homedir(),
+  env = process.env,
+}) {
+  return {
+    packageDir: path.join(repoRoot, 'packages', 'codex-memory-mcp'),
+    skillSourceDir: path.join(repoRoot, 'skills', 'portable-memory'),
+    skillDestinationDir: getSkillInstallPath({ env, homeDir }),
+    workspaceConfigTemplatePath: path.join(
+      repoRoot,
+      'workspace-memory',
+      'config',
+      'memory-config.example.json'
+    ),
+    workspaceConfigPath: getWorkspaceConfigPath(repoRoot),
+  };
 }
 
 export function planCopyAction({ sourceExists, destinationExists, label }) {
