@@ -1,6 +1,6 @@
 # Codex Portable Memory
 
-![Built with Codex](https://img.shields.io/badge/Built%20with-Codex-000000)
+[![Built with Codex](https://img.shields.io/badge/Built%20with-Codex-000000?style=flat-square)](https://openai.com/codex/)
 
 Portable memory stack for Codex, split into three reusable parts:
 
