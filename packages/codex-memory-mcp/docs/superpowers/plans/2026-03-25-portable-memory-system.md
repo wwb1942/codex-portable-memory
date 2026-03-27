@@ -8,7 +8,9 @@
 
 **Tech Stack:** TypeScript, Node.js `node:test`, LanceDB, MCP SDK, `tsx`, JSONL, Codex skill scaffolding.
 
-**Workspace Note:** `D:\codex-memory-mcp` is not currently a git repository. Treat commit steps as conditional checkpoints. If the directory is later initialized under git, use the commit messages provided here.
+**Status:** Completed in the monorepo at `D:\projects\codex-portable-memory` and validated on 2026-03-27.
+
+**Workspace Note:** This plan was originally written for a standalone `D:\codex-memory-mcp` workspace. The implemented system now lives in the monorepo at `D:\projects\codex-portable-memory\packages\codex-memory-mcp`, so treat the commit steps below as historical checkpoints.
 
 ---
 
@@ -69,7 +71,7 @@
 - Modify: `D:\codex-memory-mcp\src\server.ts`
 - Test: `D:\codex-memory-mcp\test\profile-resolution.test.mjs`
 
-- [ ] **Step 1: Write the failing profile tests**
+- [x] **Step 1: Write the failing profile tests**
 
 ```js
 import test from 'node:test';
@@ -104,13 +106,13 @@ test('project profile overrides default scope and fallback scopes', async () => 
 });
 ```
 
-- [ ] **Step 2: Run the new test to verify it fails**
+- [x] **Step 2: Run the new test to verify it fails**
 
 Run: `node --import tsx --test test/profile-resolution.test.mjs`
 
 Expected: FAIL with `Cannot find module '../src/core/profile.ts'` or equivalent assertion failures.
 
-- [ ] **Step 3: Implement the profile loader and scope resolver**
+- [x] **Step 3: Implement the profile loader and scope resolver**
 
 ```ts
 export interface MemoryProfile {
@@ -147,26 +149,26 @@ export function resolveRecallScopes(
 }
 ```
 
-- [ ] **Step 4: Wire the service and server to use the resolved profile**
+- [x] **Step 4: Wire the service and server to use the resolved profile**
 
 Implementation notes:
 - Extend `createMemoryService()` options with `profile` or `profileContext`.
 - In `src/server.ts`, load the profile using `process.cwd()` as project root and an env override such as `CODEX_MEMORY_PROJECT_ROOT` when needed.
 - Keep explicit `scope` arguments backward compatible. When `scope` is omitted, use the profile defaults.
 
-- [ ] **Step 5: Run the focused profile test again**
+- [x] **Step 5: Run the focused profile test again**
 
 Run: `node --import tsx --test test/profile-resolution.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 6: Run the full test suite to catch regressions**
+- [x] **Step 6: Run the full test suite to catch regressions**
 
 Run: `npm test`
 
 Expected: PASS with the new profile test included.
 
-- [ ] **Step 7: Create a checkpoint**
+- [x] **Step 7: Create a checkpoint**
 
 If this directory is under git:
 
@@ -185,7 +187,7 @@ git commit -m "feat: add memory profile resolution"
 - Modify: `D:\codex-memory-mcp\test\memory-roundtrip.test.mjs`
 - Test: `D:\codex-memory-mcp\test\memory-metadata.test.mjs`
 
-- [ ] **Step 1: Write the failing metadata normalization tests**
+- [x] **Step 1: Write the failing metadata normalization tests**
 
 ```js
 import test from 'node:test';
@@ -207,13 +209,13 @@ test('smart metadata backfills kind, stability, and project context', () => {
 });
 ```
 
-- [ ] **Step 2: Run the metadata test to verify it fails**
+- [x] **Step 2: Run the metadata test to verify it fails**
 
 Run: `node --import tsx --test test/memory-metadata.test.mjs`
 
 Expected: FAIL because the new normalized metadata fields are not defined yet.
 
-- [ ] **Step 3: Implement explicit memory kinds and metadata defaults**
+- [x] **Step 3: Implement explicit memory kinds and metadata defaults**
 
 ```ts
 export type MemoryKind = 'episodic' | 'semantic';
@@ -239,26 +241,26 @@ project_id?: string;
 session_id?: string;
 ```
 
-- [ ] **Step 4: Update service writes so new memories carry project-aware metadata**
+- [x] **Step 4: Update service writes so new memories carry project-aware metadata**
 
 Implementation notes:
 - On `store()`, set `kind`, `stability`, `project_id`, and `session_id` from the resolved profile/context.
 - On `update()`, preserve existing values unless explicitly replaced.
 - Add a small helper that updates `access_count` and `last_accessed_at` for recalled memories without changing user-visible text.
 
-- [ ] **Step 5: Re-run the targeted metadata tests**
+- [x] **Step 5: Re-run the targeted metadata tests**
 
 Run: `node --import tsx --test test/memory-metadata.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 6: Extend the existing round-trip test and run it**
+- [x] **Step 6: Extend the existing round-trip test and run it**
 
 Run: `node --import tsx --test test/memory-roundtrip.test.mjs`
 
 Expected: PASS with assertions covering `kind`, `stability`, and backward-compatible metadata parsing.
 
-- [ ] **Step 7: Create a checkpoint**
+- [x] **Step 7: Create a checkpoint**
 
 If this directory is under git:
 
@@ -276,7 +278,7 @@ git commit -m "feat: enrich memory metadata"
 - Modify: `D:\codex-memory-mcp\src\core\smart-metadata.ts`
 - Test: `D:\codex-memory-mcp\test\memory-recall-ranking.test.mjs`
 
-- [ ] **Step 1: Write failing ranking tests**
+- [x] **Step 1: Write failing ranking tests**
 
 ```js
 import test from 'node:test';
@@ -318,13 +320,13 @@ test('project-scoped memory outranks matching global memory', async () => {
 });
 ```
 
-- [ ] **Step 2: Run the ranking test to verify it fails**
+- [x] **Step 2: Run the ranking test to verify it fails**
 
 Run: `node --import tsx --test test/memory-recall-ranking.test.mjs`
 
 Expected: FAIL because recall currently does not apply profile-first re-ranking.
 
-- [ ] **Step 3: Implement the ranking helper**
+- [x] **Step 3: Implement the ranking helper**
 
 ```ts
 export function rankRecallResults(input: {
@@ -352,26 +354,26 @@ Implementation notes:
 - Suppress superseded memories from default recall unless a future debug/list mode asks for historical entries.
 - Apply only a small scope boost so obviously irrelevant project memories do not outrank a clearly matching global memory.
 
-- [ ] **Step 4: Change service recall to search all resolved scopes and then re-rank**
+- [x] **Step 4: Change service recall to search all resolved scopes and then re-rank**
 
 Implementation notes:
 - Replace the current single-scope filter with the resolved array from Task 1.
 - Keep `scope` on the returned record so callers can tell whether the result came from project or global memory.
 - Touch recall metadata after successful retrieval so `access_count` and `last_accessed_at` evolve over time.
 
-- [ ] **Step 5: Run the targeted ranking test again**
+- [x] **Step 5: Run the targeted ranking test again**
 
 Run: `node --import tsx --test test/memory-recall-ranking.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 6: Run the whole suite**
+- [x] **Step 6: Run the whole suite**
 
 Run: `npm test`
 
 Expected: PASS.
 
-- [ ] **Step 7: Create a checkpoint**
+- [x] **Step 7: Create a checkpoint**
 
 If this directory is under git:
 
@@ -391,7 +393,7 @@ git commit -m "feat: add project-first recall ranking"
 - Modify: `D:\codex-memory-mcp\test\mcp-server.test.mjs`
 - Test: `D:\codex-memory-mcp\test\memory-transfer.test.mjs`
 
-- [ ] **Step 1: Write failing export/import tests**
+- [x] **Step 1: Write failing export/import tests**
 
 ```js
 import test from 'node:test';
@@ -412,13 +414,13 @@ test('memory export and import preserves text, scope, and metadata', async () =>
 });
 ```
 
-- [ ] **Step 2: Run the transfer test to verify it fails**
+- [x] **Step 2: Run the transfer test to verify it fails**
 
 Run: `node --import tsx --test test/memory-transfer.test.mjs`
 
 Expected: FAIL because export/import methods and tools do not exist yet.
 
-- [ ] **Step 3: Implement export/import helpers**
+- [x] **Step 3: Implement export/import helpers**
 
 ```ts
 export interface ExportMemoryInput {
@@ -439,7 +441,7 @@ Implementation notes:
 - Import should accept old records that lack newly added metadata fields.
 - If imported vectors are missing or dimension-mismatched, regenerate vectors with the current embedder and keep the original text and metadata.
 
-- [ ] **Step 4: Add service methods and MCP tools**
+- [x] **Step 4: Add service methods and MCP tools**
 
 Register new tools in `src/server.ts`:
 
@@ -454,7 +456,7 @@ Tool shape guidance:
 - `memory_export`: accept `path`, `scope`, `category`
 - `memory_import`: accept `path`, `mode`, `scope`
 
-- [ ] **Step 5: Fix the MCP server test so it is portable**
+- [x] **Step 5: Fix the MCP server test so it is portable**
 
 Replace the hard-coded server path:
 
@@ -473,7 +475,7 @@ const __dirname = dirname(__filename);
 const serverEntry = join(__dirname, '..', 'src', 'server.ts');
 ```
 
-- [ ] **Step 6: Run the focused tests**
+- [x] **Step 6: Run the focused tests**
 
 Run:
 
@@ -484,13 +486,13 @@ node --import tsx --test test/mcp-server.test.mjs
 
 Expected: PASS.
 
-- [ ] **Step 7: Run the full suite**
+- [x] **Step 7: Run the full suite**
 
 Run: `npm test`
 
 Expected: PASS with the tool list now containing `memory_list`, `memory_export`, and `memory_import`.
 
-- [ ] **Step 8: Create a checkpoint**
+- [x] **Step 8: Create a checkpoint**
 
 If this directory is under git:
 
@@ -509,7 +511,7 @@ git commit -m "feat: add portable memory export and import"
 - Modify: `D:\codex-memory-mcp\src\core\smart-metadata.ts`
 - Test: `D:\codex-memory-mcp\test\memory-compaction.test.mjs`
 
-- [ ] **Step 1: Write failing compaction tests**
+- [x] **Step 1: Write failing compaction tests**
 
 ```js
 import test from 'node:test';
@@ -522,13 +524,13 @@ test('compaction keeps the stronger memory and invalidates the weaker duplicate'
 });
 ```
 
-- [ ] **Step 2: Run the compaction test to verify it fails**
+- [x] **Step 2: Run the compaction test to verify it fails**
 
 Run: `node --import tsx --test test/memory-compaction.test.mjs`
 
 Expected: FAIL because compaction logic and the MCP tool do not exist yet.
 
-- [ ] **Step 3: Implement a conservative compaction engine**
+- [x] **Step 3: Implement a conservative compaction engine**
 
 ```ts
 export interface CompactMemoryInput {
@@ -554,26 +556,26 @@ Rules to encode:
   - `kind === 'episodic'`
   - stale `last_accessed_at`
 
-- [ ] **Step 4: Add a service method and the `memory_compact` tool**
+- [x] **Step 4: Add a service method and the `memory_compact` tool**
 
 Implementation notes:
 - Support `dryRun` first so the behavior is inspectable before deletion.
 - Return counts and changed IDs in structured content.
 - Prefer metadata invalidation over destructive deletion when preserving history matters.
 
-- [ ] **Step 5: Run the targeted compaction test**
+- [x] **Step 5: Run the targeted compaction test**
 
 Run: `node --import tsx --test test/memory-compaction.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 6: Run the full suite**
+- [x] **Step 6: Run the full suite**
 
 Run: `npm test`
 
 Expected: PASS.
 
-- [ ] **Step 7: Create a checkpoint**
+- [x] **Step 7: Create a checkpoint**
 
 If this directory is under git:
 
@@ -590,7 +592,7 @@ git commit -m "feat: add memory compaction workflow"
 - Modify: `D:\codex-memory-mcp\README.md`
 - Test: `C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\quick_validate.py`
 
-- [ ] **Step 1: Initialize the skill in the default auto-discovery location**
+- [x] **Step 1: Initialize the skill in the default auto-discovery location**
 
 Run:
 
@@ -600,7 +602,7 @@ python C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\init_s
 
 Expected: A new directory at `C:\Users\Administrator\.codex\skills\portable-memory`.
 
-- [ ] **Step 2: Replace the generated placeholders with the real workflow**
+- [x] **Step 2: Replace the generated placeholders with the real workflow**
 
 The skill body should instruct Codex to:
 - recall before substantial work
@@ -618,7 +620,7 @@ description: Use when the user wants long-term memory, portable project memory, 
 ---
 ```
 
-- [ ] **Step 3: Validate the skill folder**
+- [x] **Step 3: Validate the skill folder**
 
 Run:
 
@@ -628,7 +630,7 @@ python C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\quick_
 
 Expected: PASS with no YAML frontmatter or naming errors.
 
-- [ ] **Step 4: Add a short usage section to the project README**
+- [x] **Step 4: Add a short usage section to the project README**
 
 Document:
 - how to register the MCP server
@@ -636,7 +638,7 @@ Document:
 - when to create `.codex/memory-profile.json`
 - how to export/import memories during migration
 
-- [ ] **Step 5: Create a checkpoint**
+- [x] **Step 5: Create a checkpoint**
 
 If this directory is under git and the skill path is vendored into a repository, commit there using:
 
@@ -652,7 +654,7 @@ git commit -m "docs: document portable memory skill workflow"
 - Modify: `D:\codex-memory-mcp\README.md`
 - Test: `D:\codex-memory-mcp\test\mcp-server.test.mjs`
 
-- [ ] **Step 1: Add an example project profile**
+- [x] **Step 1: Add an example project profile**
 
 Create:
 
@@ -673,7 +675,7 @@ Create:
 }
 ```
 
-- [ ] **Step 2: Update the README with the full operator flow**
+- [x] **Step 2: Update the README with the full operator flow**
 
 Document these sections:
 - profile discovery order
@@ -682,19 +684,19 @@ Document these sections:
 - skill path and validation command
 - recommendation to use `project` memory for repo-specific decisions and `global` for long-term preferences
 
-- [ ] **Step 3: Run the end-to-end MCP test one more time**
+- [x] **Step 3: Run the end-to-end MCP test one more time**
 
 Run: `node --import tsx --test test/mcp-server.test.mjs`
 
 Expected: PASS with the expanded tool set and no path assumptions tied to `D:\`.
 
-- [ ] **Step 4: Run the final full verification**
+- [x] **Step 4: Run the final full verification**
 
 Run: `npm test`
 
 Expected: PASS.
 
-- [ ] **Step 5: Create a final checkpoint**
+- [x] **Step 5: Create a final checkpoint**
 
 If this directory is under git:
 
@@ -705,15 +707,15 @@ git commit -m "docs: add portable memory operating guide"
 
 ## Final Verification Checklist
 
-- [ ] `node --import tsx --test test/profile-resolution.test.mjs`
-- [ ] `node --import tsx --test test/memory-metadata.test.mjs`
-- [ ] `node --import tsx --test test/memory-recall-ranking.test.mjs`
-- [ ] `node --import tsx --test test/memory-transfer.test.mjs`
-- [ ] `node --import tsx --test test/memory-compaction.test.mjs`
-- [ ] `node --import tsx --test test/memory-roundtrip.test.mjs`
-- [ ] `node --import tsx --test test/mcp-server.test.mjs`
-- [ ] `npm test`
-- [ ] `python C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\quick_validate.py C:\Users\Administrator\.codex\skills\portable-memory`
+- [x] `node --import tsx --test test/profile-resolution.test.mjs`
+- [x] `node --import tsx --test test/memory-metadata.test.mjs`
+- [x] `node --import tsx --test test/memory-recall-ranking.test.mjs`
+- [x] `node --import tsx --test test/memory-transfer.test.mjs`
+- [x] `node --import tsx --test test/memory-compaction.test.mjs`
+- [x] `node --import tsx --test test/memory-roundtrip.test.mjs`
+- [x] `node --import tsx --test test/mcp-server.test.mjs`
+- [x] `npm test`
+- [x] `python C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\quick_validate.py C:\Users\Administrator\.codex\skills\portable-memory`
 
 ## Execution Notes
 
@@ -721,3 +723,4 @@ git commit -m "docs: add portable memory operating guide"
 - Keep the MCP tool surface explicit and inspectable.
 - Prefer adding small focused modules instead of growing `memory-service.ts` and `server.ts` further than necessary.
 - When a new behavior can be encoded as metadata plus ranking, prefer that over schema churn in the LanceDB row shape.
+
