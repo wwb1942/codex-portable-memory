@@ -1,4 +1,5 @@
 .worktrees/
+.codex/
 packages/codex-memory-mcp/node_modules/
 packages/codex-memory-mcp/.codex/
 workspace-memory/config/memory-config.json

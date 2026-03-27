@@ -141,6 +141,34 @@ async function main() {
     logOutcome('kept', `existing config at ${operations.workspaceConfigPath}`);
   }
 
+  const projectProfileTemplateExists = await fs
+    .access(operations.projectMemoryProfileTemplatePath)
+    .then(() => true)
+    .catch(() => false);
+  const projectProfileDestinationExists = await fs
+    .access(operations.projectMemoryProfilePath)
+    .then(() => true)
+    .catch(() => false);
+  const projectProfileAction = planCopyAction({
+    sourceExists: projectProfileTemplateExists,
+    destinationExists: projectProfileDestinationExists,
+    label: 'project memory profile',
+  });
+
+  if (projectProfileAction.kind === 'error') {
+    throw new Error(`Missing tracked source for ${projectProfileAction.label}.`);
+  }
+
+  if (projectProfileAction.kind === 'create') {
+    await copyFileIfMissing(
+      operations.projectMemoryProfileTemplatePath,
+      operations.projectMemoryProfilePath
+    );
+    logOutcome('done', `created project profile at ${operations.projectMemoryProfilePath}`);
+  } else {
+    logOutcome('kept', `existing project profile at ${operations.projectMemoryProfilePath}`);
+  }
+
   if (!loggingCommand) {
     logOutcome('warn', 'No supported PowerShell command was found; logging setup remains optional.');
   }

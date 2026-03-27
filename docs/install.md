@@ -33,6 +33,7 @@ Bootstrap performs only repository-safe setup:
 - installs or validates dependencies for `packages/codex-memory-mcp`
 - installs `skills/portable-memory` into your Codex skills directory
 - creates `workspace-memory/config/memory-config.json` from the tracked example if it does not already exist
+- creates `.codex/memory-profile.json` from the tracked example if it does not already exist
 - preserves existing skill and config destinations instead of overwriting them
 - prints exact next commands for MCP registration and verification
 
@@ -42,6 +43,8 @@ Bootstrap does **not**:
 - auto-edit your Codex MCP configuration
 - auto-register scheduled tasks
 - write personal memory data into this repository
+
+The generated `.codex/memory-profile.json` is local project configuration, not memory content. It is git-ignored and can be edited if you want a different `projectId` or default scope.
 
 ## Required Next Steps
 
@@ -97,6 +100,7 @@ This is expected. Bootstrap is intentionally non-destructive and will not overwr
 
 - `~/.codex/skills/portable-memory`
 - `workspace-memory/config/memory-config.json`
+- `.codex/memory-profile.json`
 
 If you want a fresh local config, remove the target file yourself and run bootstrap again.
 

@@ -138,4 +138,12 @@ test('planBootstrapOperations resolves tracked sources and user destinations', (
     plan.workspaceConfigPath,
     path.join('/repo-root', 'workspace-memory', 'config', 'memory-config.json')
   );
+  assert.equal(
+    plan.projectMemoryProfileTemplatePath,
+    path.join('/repo-root', 'examples', 'memory-profile.json')
+  );
+  assert.equal(
+    plan.projectMemoryProfilePath,
+    path.join('/repo-root', '.codex', 'memory-profile.json')
+  );
 });

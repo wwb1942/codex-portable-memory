@@ -76,7 +76,10 @@ Bootstrap will:
 - install or validate `packages/codex-memory-mcp` dependencies
 - install `skills/portable-memory` into your local Codex skills directory
 - create `workspace-memory/config/memory-config.json` if it does not already exist
+- create `.codex/memory-profile.json` if it does not already exist
 - print exact next-step commands for MCP registration and verification
+
+The generated `.codex/memory-profile.json` is repo-local configuration, ignored by git, and safe to edit if you want a different default project scope.
 
 Full install and troubleshooting notes live in [docs/install.md](docs/install.md).
 

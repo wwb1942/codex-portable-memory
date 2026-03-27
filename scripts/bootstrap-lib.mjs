@@ -52,6 +52,8 @@ export function planBootstrapOperations({
       'memory-config.example.json'
     ),
     workspaceConfigPath: getWorkspaceConfigPath(repoRoot),
+    projectMemoryProfileTemplatePath: path.join(repoRoot, 'examples', 'memory-profile.json'),
+    projectMemoryProfilePath: path.join(repoRoot, '.codex', 'memory-profile.json'),
   };
 }
 

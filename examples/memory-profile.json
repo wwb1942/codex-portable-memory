@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "projectId": "codex-memory-mcp",
-  "defaultScope": "project:codex-memory-mcp",
+  "projectId": "codex-portable-memory",
+  "defaultScope": "project:codex-portable-memory",
   "fallbackScopes": ["global"],
   "writePolicy": {
     "defaultKind": "episodic",
