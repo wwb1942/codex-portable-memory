@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 import {
   buildCommandInvocation,
@@ -146,4 +149,96 @@ test('planBootstrapOperations resolves tracked sources and user destinations', (
     plan.projectMemoryProfilePath,
     path.join('/repo-root', '.codex', 'memory-profile.json')
   );
+});
+
+test('bootstrap CLI creates and then preserves the project memory profile', async () => {
+  const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'portable-memory-bootstrap-'));
+  const repoRoot = path.join(fixtureRoot, 'repo');
+  const scriptsDir = path.join(repoRoot, 'scripts');
+  const packageDir = path.join(repoRoot, 'packages', 'codex-memory-mcp');
+  const skillDir = path.join(repoRoot, 'skills', 'portable-memory');
+  const workspaceConfigDir = path.join(repoRoot, 'workspace-memory', 'config');
+  const examplesDir = path.join(repoRoot, 'examples');
+  const fakeBinDir = path.join(fixtureRoot, 'bin');
+  const fakeCodexHome = path.join(fixtureRoot, 'codex-home');
+  const projectProfilePath = path.join(repoRoot, '.codex', 'memory-profile.json');
+
+  await fs.mkdir(scriptsDir, { recursive: true });
+  await fs.mkdir(packageDir, { recursive: true });
+  await fs.mkdir(skillDir, { recursive: true });
+  await fs.mkdir(workspaceConfigDir, { recursive: true });
+  await fs.mkdir(examplesDir, { recursive: true });
+  await fs.mkdir(fakeBinDir, { recursive: true });
+
+  await fs.copyFile(
+    path.join(process.cwd(), 'scripts', 'bootstrap.mjs'),
+    path.join(scriptsDir, 'bootstrap.mjs')
+  );
+  await fs.copyFile(
+    path.join(process.cwd(), 'scripts', 'bootstrap-lib.mjs'),
+    path.join(scriptsDir, 'bootstrap-lib.mjs')
+  );
+  await fs.writeFile(path.join(packageDir, 'package.json'), '{\"name\":\"fixture-package\"}\n');
+  await fs.writeFile(path.join(skillDir, 'SKILL.md'), '# portable-memory\n');
+  await fs.writeFile(
+    path.join(workspaceConfigDir, 'memory-config.example.json'),
+    '{\"version\":1}\n'
+  );
+  await fs.writeFile(
+    path.join(examplesDir, 'memory-profile.json'),
+    '{\"version\":1,\"projectId\":\"fixture-project\",\"defaultScope\":\"project:fixture-project\"}\n'
+  );
+  await fs.writeFile(
+    path.join(fakeBinDir, 'npm.cmd'),
+    '@echo off\r\nif "%1"=="--version" exit /b 0\r\nif "%1"=="install" exit /b 0\r\nexit /b 0\r\n'
+  );
+
+  async function runBootstrap() {
+    return new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [path.join(scriptsDir, 'bootstrap.mjs')], {
+        cwd: repoRoot,
+        env: {
+          ...process.env,
+          CODEX_HOME: fakeCodexHome,
+          PATH: `${fakeBinDir}${path.delimiter}${process.env.PATH || ''}`,
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: false,
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      child.stdout.on('data', chunk => {
+        stdout += chunk.toString();
+      });
+      child.stderr.on('data', chunk => {
+        stderr += chunk.toString();
+      });
+      child.on('error', reject);
+      child.on('close', code => {
+        resolve({
+          code,
+          stdout,
+          stderr,
+        });
+      });
+    });
+  }
+
+  const firstRun = await runBootstrap();
+
+  assert.equal(firstRun.code, 0, firstRun.stderr);
+  assert.match(firstRun.stdout, /done created project profile at /);
+  assert.equal(
+    await fs.readFile(projectProfilePath, 'utf8'),
+    '{"version":1,"projectId":"fixture-project","defaultScope":"project:fixture-project"}\n'
+  );
+
+  const secondRun = await runBootstrap();
+
+  assert.equal(secondRun.code, 0, secondRun.stderr);
+  assert.match(secondRun.stdout, /kept existing project profile at /);
+
+  await fs.rm(fixtureRoot, { recursive: true, force: true });
 });
