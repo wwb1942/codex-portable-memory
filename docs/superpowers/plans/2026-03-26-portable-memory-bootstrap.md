@@ -8,6 +8,8 @@
 
 **Tech Stack:** Node.js ESM, `node:test`, PowerShell wrapper, POSIX shell wrapper, Markdown docs.
 
+**Status:** Completed on 2026-03-27 and merged to `main` in `5fec6e7`.
+
 ---
 
 ## File Map
@@ -39,7 +41,7 @@
 - Create: `D:\projects\codex-portable-memory\scripts\bootstrap.test.mjs`
 - Test: `D:\projects\codex-portable-memory\scripts\bootstrap.test.mjs`
 
-- [ ] **Step 1: Write the failing helper tests**
+- [x] **Step 1: Write the failing helper tests**
 
 ```js
 import test from 'node:test';
@@ -83,13 +85,13 @@ test('renderNextSteps includes pwsh guidance only when available', () => {
 });
 ```
 
-- [ ] **Step 2: Run the helper tests to verify they fail**
+- [x] **Step 2: Run the helper tests to verify they fail**
 
 Run: `node --test scripts/bootstrap.test.mjs`
 
 Expected: FAIL with `Cannot find module './bootstrap-lib.mjs'` or missing export errors.
 
-- [ ] **Step 3: Implement the pure helper module**
+- [x] **Step 3: Implement the pure helper module**
 
 ```js
 import os from 'node:os';
@@ -122,13 +124,13 @@ Implementation notes:
 - export platform-aware command rendering separately from command execution
 - expose helper functions for repo-local tracked sources and user-home destinations
 
-- [ ] **Step 4: Run the helper tests again**
+- [x] **Step 4: Run the helper tests again**
 
 Run: `node --test scripts/bootstrap.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 5: Create a checkpoint**
+- [x] **Step 5: Create a checkpoint**
 
 ```bash
 git add scripts/bootstrap-lib.mjs scripts/bootstrap.test.mjs
@@ -142,7 +144,7 @@ git commit -m "test: add bootstrap helper coverage"
 - Modify: `D:\projects\codex-portable-memory\scripts\bootstrap-lib.mjs`
 - Test: `D:\projects\codex-portable-memory\scripts\bootstrap.test.mjs`
 
-- [ ] **Step 1: Add one failing CLI-oriented helper test for next-step rendering**
+- [x] **Step 1: Add one failing CLI-oriented helper test for next-step rendering**
 
 ```js
 test('renderNextSteps prints codex mcp registration command from repo root', () => {
@@ -156,13 +158,13 @@ test('renderNextSteps prints codex mcp registration command from repo root', () 
 });
 ```
 
-- [ ] **Step 2: Run the helper suite to confirm the new assertion fails if needed**
+- [x] **Step 2: Run the helper suite to confirm the new assertion fails if needed**
 
 Run: `node --test scripts/bootstrap.test.mjs`
 
 Expected: FAIL until `renderNextSteps()` and path normalization match the bootstrap output contract.
 
-- [ ] **Step 3: Implement the CLI entrypoint**
+- [x] **Step 3: Implement the CLI entrypoint**
 
 ```js
 #!/usr/bin/env node
@@ -200,13 +202,13 @@ Implementation notes:
   - `warning`
   - `next`
 
-- [ ] **Step 4: Run the helper test suite again**
+- [x] **Step 4: Run the helper test suite again**
 
 Run: `node --test scripts/bootstrap.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 5: Smoke-test the CLI in dry local execution**
+- [x] **Step 5: Smoke-test the CLI in dry local execution**
 
 Run: `node scripts/bootstrap.mjs`
 
@@ -216,7 +218,7 @@ Expected:
 - reports whether skill/config were created or preserved
 - prints MCP registration and verification commands
 
-- [ ] **Step 6: Create a checkpoint**
+- [x] **Step 6: Create a checkpoint**
 
 ```bash
 git add scripts/bootstrap.mjs scripts/bootstrap-lib.mjs scripts/bootstrap.test.mjs
@@ -230,7 +232,7 @@ git commit -m "feat: add bootstrap cli"
 - Create: `D:\projects\codex-portable-memory\bootstrap.sh`
 - Test: `D:\projects\codex-portable-memory\scripts\bootstrap.mjs`
 
-- [ ] **Step 1: Write the Windows wrapper**
+- [x] **Step 1: Write the Windows wrapper**
 
 ```powershell
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -242,7 +244,7 @@ Rules:
 - fail if `node` is unavailable
 - preserve exit code from the Node entrypoint
 
-- [ ] **Step 2: Write the Unix wrapper**
+- [x] **Step 2: Write the Unix wrapper**
 
 ```bash
 #!/usr/bin/env bash
@@ -252,13 +254,13 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 node "$repo_root/scripts/bootstrap.mjs" "$@"
 ```
 
-- [ ] **Step 3: Mark the shell wrapper executable**
+- [x] **Step 3: Mark the shell wrapper executable**
 
 Run: `git update-index --chmod=+x bootstrap.sh`
 
 Expected: executable bit recorded for `bootstrap.sh`.
 
-- [ ] **Step 4: Verify both wrappers delegate correctly**
+- [x] **Step 4: Verify both wrappers delegate correctly**
 
 Run:
 
@@ -272,7 +274,7 @@ bash ./bootstrap.sh
 
 Expected: both wrappers produce the same bootstrap summary as `node scripts/bootstrap.mjs`.
 
-- [ ] **Step 5: Create a checkpoint**
+- [x] **Step 5: Create a checkpoint**
 
 ```bash
 git add bootstrap.ps1 bootstrap.sh
@@ -286,7 +288,7 @@ git commit -m "feat: add bootstrap wrappers"
 - Modify: `D:\projects\codex-portable-memory\README.md`
 - Test: manual read-through of the rendered Markdown
 
-- [ ] **Step 1: Draft `docs/install.md`**
+- [x] **Step 1: Draft `docs/install.md`**
 
 Required sections:
 - prerequisites
@@ -314,7 +316,7 @@ Use this skeleton:
 ## Troubleshooting
 ```
 
-- [ ] **Step 2: Rewrite README quick start to be bootstrap-first**
+- [x] **Step 2: Rewrite README quick start to be bootstrap-first**
 
 Replace the long manual setup sequence with:
 
@@ -344,14 +346,14 @@ Documentation rules:
 - link to `docs/install.md` for full setup details
 - keep verification commands visible
 
-- [ ] **Step 3: Manually review the docs for misleading claims**
+- [x] **Step 3: Manually review the docs for misleading claims**
 
 Check:
 - no claim that scheduled task setup is required
 - no claim that bootstrap edits Codex MCP config automatically
 - no instruction implies personal memory data is part of the repository
 
-- [ ] **Step 4: Create a checkpoint**
+- [x] **Step 4: Create a checkpoint**
 
 ```bash
 git add README.md docs/install.md
@@ -366,13 +368,13 @@ git commit -m "docs: add bootstrap-first install guide"
 - Test: `D:\projects\codex-portable-memory\README.md`
 - Test: `D:\projects\codex-portable-memory\docs\install.md`
 
-- [ ] **Step 1: Run bootstrap unit tests**
+- [x] **Step 1: Run bootstrap unit tests**
 
 Run: `node --test scripts/bootstrap.test.mjs`
 
 Expected: PASS.
 
-- [ ] **Step 2: Run the bootstrap CLI once in the current repo**
+- [x] **Step 2: Run the bootstrap CLI once in the current repo**
 
 Run: `node scripts/bootstrap.mjs`
 
@@ -381,7 +383,7 @@ Expected:
 - no overwrite of existing user config
 - clear summary of created versus kept paths
 
-- [ ] **Step 3: Run the MCP package verification**
+- [x] **Step 3: Run the MCP package verification**
 
 Run:
 
@@ -393,7 +395,7 @@ npm run typecheck
 
 Expected: PASS.
 
-- [ ] **Step 4: If `pwsh` is available, run workspace-memory tests**
+- [x] **Step 4: If `pwsh` is available, run workspace-memory tests**
 
 Run:
 
@@ -403,7 +405,7 @@ Invoke-Pester -Path .\workspace-memory\tests
 
 Expected: PASS.
 
-- [ ] **Step 5: Confirm the working tree is clean**
+- [x] **Step 5: Confirm the working tree is clean**
 
 Run: `git status --short`
 
