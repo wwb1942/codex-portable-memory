@@ -6,8 +6,10 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildCommandInvocation,
+  getProbeArgs,
   planBootstrapOperations,
   planCopyAction,
+  resolveLoggingCommand,
   renderNextSteps,
 } from './bootstrap-lib.mjs';
 
@@ -36,7 +38,7 @@ function runCommand(command, args, options = {}) {
   });
 }
 
-function probeCommand(command, args = ['--version']) {
+function probeCommand(command, args = getProbeArgs(command)) {
   return new Promise(resolve => {
     const invocation = buildCommandInvocation(command, args);
     const child = spawn(invocation.command, invocation.args, {
@@ -75,6 +77,13 @@ async function main() {
   }
 
   const hasPwsh = await probeCommand('pwsh');
+  const hasWindowsPowerShell =
+    process.platform === 'win32' ? await probeCommand('powershell') : false;
+  const loggingCommand = resolveLoggingCommand({
+    platform: process.platform,
+    hasPwsh,
+    hasWindowsPowerShell,
+  });
   const operations = planBootstrapOperations({ repoRoot });
 
   await runCommand('npm', ['install'], {
@@ -132,12 +141,12 @@ async function main() {
     logOutcome('kept', `existing config at ${operations.workspaceConfigPath}`);
   }
 
-  if (!hasPwsh) {
-    logOutcome('warn', 'pwsh was not found; PowerShell-based logging setup remains optional.');
+  if (!loggingCommand) {
+    logOutcome('warn', 'No supported PowerShell command was found; logging setup remains optional.');
   }
 
   process.stdout.write('\n');
-  process.stdout.write(renderNextSteps({ repoRoot, hasPwsh }));
+  process.stdout.write(renderNextSteps({ repoRoot, loggingCommand }));
 }
 
 main().catch(error => {

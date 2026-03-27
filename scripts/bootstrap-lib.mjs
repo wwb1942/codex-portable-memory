@@ -5,6 +5,14 @@ export function getCodexHome(env = process.env) {
   return env.CODEX_HOME || path.join(os.homedir(), '.codex');
 }
 
+export function getProbeArgs(command) {
+  if (command === 'pwsh' || command === 'powershell') {
+    return ['-NoLogo', '-NoProfile', '-Command', 'exit 0'];
+  }
+
+  return ['--version'];
+}
+
 export function buildCommandInvocation(command, args = [], platform = process.platform) {
   if (platform === 'win32') {
     return {
@@ -69,7 +77,23 @@ export function planCopyAction({ sourceExists, destinationExists, label }) {
   };
 }
 
-export function renderNextSteps({ repoRoot, hasPwsh }) {
+export function resolveLoggingCommand({
+  platform = process.platform,
+  hasPwsh = false,
+  hasWindowsPowerShell = false,
+}) {
+  if (hasPwsh) {
+    return 'pwsh';
+  }
+
+  if (platform === 'win32' && hasWindowsPowerShell) {
+    return 'powershell';
+  }
+
+  return null;
+}
+
+export function renderNextSteps({ repoRoot, loggingCommand }) {
   const serverPath = path.posix.join(
     repoRoot.replace(/\\/g, '/'),
     'packages',
@@ -84,9 +108,9 @@ export function renderNextSteps({ repoRoot, hasPwsh }) {
     `- Verify package: cd ${repoRoot.replace(/\\/g, '/')}/packages/codex-memory-mcp && npm test && npm run typecheck`,
   ];
 
-  if (hasPwsh) {
+  if (loggingCommand) {
     steps.push(
-      `- Optional logging: pwsh -File ${repoRoot.replace(/\\/g, '/')}/workspace-memory/scripts/write-daily-memory.ps1`
+      `- Optional logging: ${loggingCommand} -ExecutionPolicy Bypass -File ${repoRoot.replace(/\\/g, '/')}/workspace-memory/scripts/write-daily-memory.ps1`
     );
   }
 

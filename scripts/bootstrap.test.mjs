@@ -4,11 +4,13 @@ import path from 'node:path';
 
 import {
   buildCommandInvocation,
+  getProbeArgs,
   getCodexHome,
   getSkillInstallPath,
   getWorkspaceConfigPath,
   planCopyAction,
   planBootstrapOperations,
+  resolveLoggingCommand,
   renderNextSteps,
 } from './bootstrap-lib.mjs';
 
@@ -32,6 +34,12 @@ test('buildCommandInvocation leaves commands unchanged off Windows', () => {
     command: 'npm',
     args: ['--version'],
   });
+});
+
+test('getProbeArgs uses command-specific probes', () => {
+  assert.deepEqual(getProbeArgs('npm'), ['--version']);
+  assert.deepEqual(getProbeArgs('pwsh'), ['-NoLogo', '-NoProfile', '-Command', 'exit 0']);
+  assert.deepEqual(getProbeArgs('powershell'), ['-NoLogo', '-NoProfile', '-Command', 'exit 0']);
 });
 
 test('getSkillInstallPath uses the codex home skills directory', () => {
@@ -69,14 +77,33 @@ test('planCopyAction preserves existing destination', () => {
   assert.equal(action.kind, 'keep');
 });
 
-test('renderNextSteps includes pwsh guidance only when available', () => {
+test('resolveLoggingCommand prefers pwsh and falls back to powershell on Windows', () => {
+  assert.equal(
+    resolveLoggingCommand({
+      platform: 'win32',
+      hasPwsh: true,
+      hasWindowsPowerShell: true,
+    }),
+    'pwsh'
+  );
+  assert.equal(
+    resolveLoggingCommand({
+      platform: 'win32',
+      hasPwsh: false,
+      hasWindowsPowerShell: true,
+    }),
+    'powershell'
+  );
+});
+
+test('renderNextSteps includes logging guidance only when a logging shell is available', () => {
   const withPwsh = renderNextSteps({
     repoRoot: '/repo-root',
-    hasPwsh: true,
+    loggingCommand: 'pwsh',
   });
   const withoutPwsh = renderNextSteps({
     repoRoot: '/repo-root',
-    hasPwsh: false,
+    loggingCommand: null,
   });
 
   assert.match(withPwsh, /write-daily-memory/);
@@ -86,7 +113,7 @@ test('renderNextSteps includes pwsh guidance only when available', () => {
 test('renderNextSteps prints codex mcp registration command from repo root', () => {
   const output = renderNextSteps({
     repoRoot: 'D:/projects/codex-portable-memory',
-    hasPwsh: true,
+    loggingCommand: 'pwsh',
   });
 
   assert.match(output, /codex mcp add codex-memory/);
